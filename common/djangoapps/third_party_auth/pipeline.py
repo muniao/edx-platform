@@ -220,6 +220,18 @@ def get(request):
     return pipeline_data
 
 
+def get_idp_config_from_running_pipeline(request):
+    """
+    Returns: IdP's config associated with running pipeline
+    """
+    tpa_provider = None
+    running_pipeline = get(request)
+    if running_pipeline:
+        tpa_provider = provider.Registry.get_from_pipeline(running_pipeline)
+
+    return tpa_provider.get_config() if tpa_provider else None
+
+
 def get_real_social_auth_object(request):
     """
     At times, the pipeline will have a "social" kwarg that contains a dictionary
