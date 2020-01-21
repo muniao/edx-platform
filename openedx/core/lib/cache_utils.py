@@ -10,8 +10,11 @@ import zlib
 
 import six
 import wrapt
+from django.core.cache import cache
+from django.db.models.signals import post_save, post_delete
 from django.utils.encoding import force_text
-from edx_django_utils.cache import RequestCache
+
+from edx_django_utils.cache import RequestCache, TieredCache
 from six import iteritems
 from six.moves import cPickle as pickle
 from six.moves import map
@@ -149,6 +152,35 @@ class process_cached(object):  # pylint: disable=invalid-name
         Support instance methods.
         """
         return functools.partial(self.__call__, obj)
+
+
+class CacheInvalidationManager:
+    def __init__(self, namespace=None, model=None, cache_time=86400):
+        if model:
+            post_save.connect(self.invalidate, sender=model)
+            post_delete.connect(self.invalidate, sender=model)
+            namespace = str(model)
+        self.namespace = namespace
+        self.cache_time = cache_time
+        self.keys = set()
+
+    def invalidate(self, **kwargs):
+        for key in self.keys:
+            TieredCache.delete_all_tiers(key)
+
+    def __call__(self, func):
+        cache_key = '{}.{}.{}'.format(self.namespace, func.__module__, func.__name__)
+        self.keys.add(cache_key)
+
+        @functools.wraps(func)
+        def decorator(*args, **kwargs):
+            result = TieredCache.get_cached_response(cache_key)
+            if result.is_found:
+                return result.value
+            result = func()
+            TieredCache.set_all_tiers(cache_key, result, self.cache_time)
+            return result
+        return decorator
 
 
 def zpickle(data):
