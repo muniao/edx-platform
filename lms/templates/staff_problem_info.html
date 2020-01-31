@@ -6,7 +6,7 @@ from openedx.core.djangolib.markup import HTML
 from openedx.core.djangolib.js_utils import js_escaped_string
 from six import text_type
 %>
-
+<%include file="./courseware/xqa_interface.html"/>
 ## The JS for this is defined in xqa_interface.html
 ${block_content | n, decode.utf8}
 %if 'detached' not in tags:

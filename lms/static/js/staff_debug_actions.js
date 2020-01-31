@@ -4,7 +4,12 @@ var StaffDebug = (function() {
     /* global getCurrentUrl:true */
     var getURL = function(action) {
         var pathname = this.getCurrentUrl();
-        return pathname.substr(0, pathname.indexOf('/courseware')) + '/instructor/api/' + action;
+        var index =pathname.indexOf('/courseware');
+
+        if(index >= 0 ){
+            pathname= pathname.substr(0, index) + '/instructor/api/' + action;
+        }
+        return pathname + '/api/' + action;
     };
 
     var sanitizeString = function(string) {
@@ -84,6 +89,7 @@ var StaffDebug = (function() {
     };
 
     var deleteStudentState = function(locname, location) {
+    console.log(locname,location)
         this.doInstructorDashAction({
             locationName: locname,
             location: location,
@@ -150,16 +156,20 @@ var StaffDebug = (function() {
 
 // Register click handlers
 $(document).ready(function() {
-    var $courseContent = $('.course-content');
+    var $courseContent = $('body');
     $courseContent.on('click', '.staff-debug-reset', function() {
         StaffDebug.reset($(this).parent().data('location-name'), $(this).parent().data('location'));
         return false;
     });
     $courseContent.on('click', '.staff-debug-sdelete', function() {
+      console.log($(this).parent().data('location-name'))
+        console.log($(this).parent().data('location'))
+        console.log($(this).parent())
         StaffDebug.deleteStudentState($(this).parent().data('location-name'), $(this).parent().data('location'));
         return false;
     });
     $courseContent.on('click', '.staff-debug-rescore', function() {
+
         StaffDebug.rescore($(this).parent().data('location-name'), $(this).parent().data('location'));
         return false;
     });
