@@ -83,6 +83,7 @@ from social_core.pipeline import partial
 from social_core.pipeline.social_auth import associate_by_email
 from social_core.utils import module_member, slugify
 
+import third_party_auth
 from edxmako.shortcuts import render_to_string
 from lms.djangoapps.verify_student.models import SSOVerification
 from lms.djangoapps.verify_student.utils import earliest_allowed_verification_date
@@ -225,9 +226,10 @@ def get_idp_config_from_running_pipeline(request):
     Returns: IdP's config associated with running pipeline
     """
     tpa_provider = None
-    running_pipeline = get(request)
-    if running_pipeline:
-        tpa_provider = provider.Registry.get_from_pipeline(running_pipeline)
+    if third_party_auth.is_enabled():
+        running_pipeline = get(request)
+        if running_pipeline:
+            tpa_provider = provider.Registry.get_from_pipeline(running_pipeline)
 
     return tpa_provider.get_config() if tpa_provider else None
 
