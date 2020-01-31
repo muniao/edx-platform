@@ -4,14 +4,8 @@ var StaffDebug = (function() {
     /* global getCurrentUrl:true */
     var getURL = function(action) {
         var pathname = this.getCurrentUrl();
-        var index =pathname.indexOf('/courseware');
-
-        if(index >= 0 ){
-            pathname= pathname.substr(0, index) + '/instructor/api/' + action;
-        } else{
-            pathname =pathname + '/api/' + action
-        }
-        return pathname;
+        var index =pathname.indexOf('/','/courses/'.length);
+        return pathname.substr(0, index) + '/instructor/api/' + action;
     };
 
     var sanitizeString = function(string) {
