@@ -8,8 +8,10 @@ var StaffDebug = (function() {
 
         if(index >= 0 ){
             pathname= pathname.substr(0, index) + '/instructor/api/' + action;
+        } else{
+            pathname =pathname + '/api/' + action
         }
-        return pathname + '/api/' + action;
+        return pathname;
     };
 
     var sanitizeString = function(string) {
