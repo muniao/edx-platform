@@ -2,9 +2,12 @@
 // Build StaffDebug object
 var StaffDebug = (function() {
     /* global getCurrentUrl:true */
-    var getURL = function(action) {
+    var getURL = function (action) {
         var pathname = this.getCurrentUrl();
-        var index =pathname.indexOf('/','/courses/'.length);
+        index = pathname.indexOf('/courseware');
+        if (index <= 0) {
+            index = pathname.indexOf('/', '/courses/'.length);
+        }
         return pathname.substr(0, index) + '/instructor/api/' + action;
     };
 
@@ -85,7 +88,6 @@ var StaffDebug = (function() {
     };
 
     var deleteStudentState = function(locname, location) {
-    console.log(locname,location)
         this.doInstructorDashAction({
             locationName: locname,
             location: location,
@@ -158,9 +160,6 @@ $(document).ready(function() {
         return false;
     });
     $courseContent.on('click', '.staff-debug-sdelete', function() {
-      console.log($(this).parent().data('location-name'))
-        console.log($(this).parent().data('location'))
-        console.log($(this).parent())
         StaffDebug.deleteStudentState($(this).parent().data('location-name'), $(this).parent().data('location'));
         return false;
     });
